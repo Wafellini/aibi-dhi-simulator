@@ -6,8 +6,8 @@ class PatientProfile(Patient):
                  good_time=1, habituation=False, time_preference_update_step = 100000000):
         
         # "resiliant" does is mildly affected by stress and fatigue and does not get motivated by competition
-        # "competition_motivated" does well when compared to peers and suffers in high stress and fatigue situations
         # "self_improver" does well when the habit is strongand when compared to peers and suffers in high stress and fatigue situations
+        # "competition_motivated" does well when compared to peers and suffers in high stress and fatigue situations
         self.patient_profile = patient_profile
         self.record = 0
         self.has_cometition = False
@@ -29,9 +29,14 @@ class PatientProfile(Patient):
     def _compare_with_peers(self):
         if self.patient_profile not in ["competition_motivated", "self_improver", "resiliant"]:
             return 0
+        
+        # self_improver is sometimes motivated by comparing with peers
+        if self.patient_profile in ["self_improver"]:
+            if np.random.randint(0, 1) == 0:
+                return 0
 
         # Sample hours of walking from a normal distribution with mean 5 and standard deviation 2
-        peers_walked = np.random.normal(5, 2)
+        peers_walked = np.random.normal(3, 2)
 
         # Compare with peers
         if self.patient_profile in ["competition_motivated", "self_improver"]:
@@ -69,7 +74,7 @@ class PatientProfile(Patient):
 
         # If stress level is high, the patient is less likely to engage in physical activity
         if self.patient_profile in ["resiliant"]:
-            if self.stress_level > 9:
+            if self.stress_level * np.random.normal(0, 1) > 9:
                 return -0.1
     
         return 0
@@ -80,9 +85,9 @@ class PatientProfile(Patient):
 
         if self.patient_profile in ["resiliant"]:
             # If fatigue level is high, the patient is less likely to engage in physical activity
-            if self.fatigue_level > 8:
+            if self.fatigue_level * np.random.normal(0, 1) > 8:
                 return -0.1
-            if self.fatigue_level > 6:
+            if self.fatigue_level * np.random.normal(0, 1) > 6:
                 return -0.05 * np.random.randint(0, 1)
     
         return 0
